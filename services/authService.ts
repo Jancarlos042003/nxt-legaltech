@@ -7,11 +7,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export const authService = {
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     try {
+      const params = new URLSearchParams();
+      params.append("username", credentials.username);
+      params.append("password", credentials.password);
+
       const response = await axios.post<LoginResponse>(
         `${API_URL}/auth/login`,
-        credentials,
+        params,
         {
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
         }
       );
       return response.data;
