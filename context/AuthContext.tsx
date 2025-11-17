@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       try {
-        const userData = await authService.me(token);
+        const userData = await authService.me();
         setUser(userData);
       } catch (error) {
         console.error("Error al cargar usuario:", error);

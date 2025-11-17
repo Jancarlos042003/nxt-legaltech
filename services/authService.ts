@@ -16,6 +16,7 @@ export const authService = {
         params,
         {
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          withCredentials: true,
         }
       );
       return response.data;
@@ -24,11 +25,11 @@ export const authService = {
     }
   },
 
-  async me(token: string): Promise<User> {
+  async me(): Promise<User> {
     try {
       const response = await axios.get<User>(`${API_URL}/auth/me`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          withCredentials: true,
         },
       });
       return response.data;

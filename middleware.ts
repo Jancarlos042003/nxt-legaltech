@@ -18,11 +18,9 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    const secretKey = getSecretKey();
-    await jwtVerify(token, secretKey);
+    await jwtVerify(token, getSecretKey());
     return NextResponse.next();
-  } catch (error) {
-    console.error("Token inválido:", error);
+  } catch (e) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 }
