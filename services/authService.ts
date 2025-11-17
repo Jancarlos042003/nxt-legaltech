@@ -28,9 +28,7 @@ export const authService = {
   async me(): Promise<User> {
     try {
       const response = await axios.get<User>(`${API_URL}/auth/me`, {
-        headers: {
-          withCredentials: true,
-        },
+        withCredentials: true,
       });
       return response.data;
     } catch (error) {
