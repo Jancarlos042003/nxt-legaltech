@@ -48,13 +48,4 @@ export const authService = {
       throw new Error("Error al obtener usuario");
     }
   },
-
-  async logout(): Promise<void> {
-    try {
-      await axios.post(`${API_URL}/auth/logout`, {}, getAuthHeaders());
-    } catch (error) {
-      // No lanzamos error aquí para asegurar que el cliente limpie su estado
-      console.error("Error en logout backend", error);
-    }
-  },
 };
