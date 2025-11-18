@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Case, CreateCaseRequest, UpdateCaseRequest } from "@/lib/case";
+import { Case, CreateCaseRequest, UpdateCaseRequest } from "@/types/case";
 import { CasesList } from "@/components/dashboard/CasesList";
 import { CaseModalForm } from "@/components/dashboard/CaseModalForm";
 import { ConfirmDialog } from "@/components/dashboard/ConfirmDialog";

@@ -1,4 +1,4 @@
-import { Case } from "@/lib/case";
+import { Case } from "@/types/case";
 import { CaseStatusBadge } from "./CaseStatusBadge";
 import { CaseActions } from "./CaseActions";
 import { formatDistanceToNow } from "date-fns";

@@ -2,14 +2,13 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createCaseSchema, updateCaseSchema } from "@/lib/case";
 import {
   Case,
   CreateCaseRequest,
   UpdateCaseRequest,
-  createCaseSchema,
-  updateCaseSchema,
   statusLabels,
-} from "@/lib/case";
+} from "@/types/case";
 
 interface CaseModalFormProps {
   isOpen: boolean;
