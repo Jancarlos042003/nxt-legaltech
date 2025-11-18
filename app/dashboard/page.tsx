@@ -1,74 +1,68 @@
 "use client";
 
-import { useState } from "react";
-import { Case, CaseFormData } from "@/lib/case";
+import { useState, useEffect } from "react";
+import { Case, CreateCaseRequest, UpdateCaseRequest } from "@/lib/case";
 import { CasesList } from "@/components/dashboard/CasesList";
 import { CaseModalForm } from "@/components/dashboard/CaseModalForm";
 import { ConfirmDialog } from "@/components/dashboard/ConfirmDialog";
-
-const initialCases: Case[] = [
-  {
-    id: "1",
-    title: "Caso de Divorcio - García vs García",
-    status: "en_proceso",
-    description: "Proceso de divorcio contencioso con división de bienes",
-    createdAt: new Date("2024-01-20").toISOString(),
-  },
-  {
-    id: "2",
-    title: "Demanda Laboral - Empresa XYZ",
-    status: "nuevo",
-    description: "Despido injustificado, reclamación de indemnización",
-    createdAt: new Date("2024-02-20").toISOString(),
-  },
-  {
-    id: "3",
-    title: "Contrato Mercantil - ABC Corp",
-    status: "finalizado",
-    description: "Revisión y negociación de contrato de servicios",
-    createdAt: new Date("2024-02-01").toISOString(),
-  },
-];
+import { caseService } from "@/services/caseService";
 
 export default function DashboardPage() {
-  const [cases, setCases] = useState<Case[]>(initialCases);
+  const [cases, setCases] = useState<Case[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingCase, setEditingCase] = useState<Case | undefined>();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [caseToDelete, setCaseToDelete] = useState<Case | undefined>();
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleCreateCase = (data: CaseFormData) => {
-    const newCase: Case = {
-      id: Date.now().toString(),
-      ...data,
-      createdAt: new Date().toISOString(),
-    };
-    setCases([...cases, newCase]);
-    setIsCreateModalOpen(false);
+  const loadCases = async () => {
+    try {
+      const data: Case[] = await caseService.getAll();
+      setCases(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleEditCase = (data: CaseFormData) => {
+  useEffect(() => {
+    loadCases();
+  }, []);
+
+  const handleCreateCase = async (data: CreateCaseRequest) => {
+    try {
+      const newCase: Case = await caseService.create(data);
+      setCases([...cases, newCase]);
+      setIsCreateModalOpen(false);
+    } catch (error) {
+      console.error("Error creando caso:", error);
+    }
+  };
+
+  const handleEditCase = async (data: UpdateCaseRequest) => {
     if (!editingCase) return;
-    setCases(
-      cases.map((c) =>
-        c.id === editingCase.id
-          ? {
-              ...c,
-              ...data,
-            }
-          : c
-      )
-    );
-    setIsEditModalOpen(false);
-    setEditingCase(undefined);
+    try {
+      const updatedCase = await caseService.update(editingCase.id, data);
+      setCases(cases.map((c) => (c.id === editingCase.id ? updatedCase : c)));
+      setIsEditModalOpen(false);
+      setEditingCase(undefined);
+    } catch (error) {
+      console.error("Error editando caso:", error);
+    }
   };
 
-  const handleDeleteCase = () => {
+  const handleDeleteCase = async () => {
     if (!caseToDelete) return;
-    setCases(cases.filter((c) => c.id !== caseToDelete.id));
-    setIsConfirmOpen(false);
-    setCaseToDelete(undefined);
+    try {
+      await caseService.delete(caseToDelete.id);
+      setCases(cases.filter((c) => c.id !== caseToDelete.id));
+      setIsConfirmOpen(false);
+      setCaseToDelete(undefined);
+    } catch (error) {
+      console.error("Error eliminando caso:", error);
+    }
   };
 
   const handleOpenEditModal = (caseItem: Case) => {
@@ -99,11 +93,18 @@ export default function DashboardPage() {
               + Crear Caso
             </button>
           </div>
-          <CasesList
-            cases={cases}
-            onEdit={handleOpenEditModal}
-            onDelete={handleOpenDeleteConfirm}
-          />
+
+          {isLoading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">Cargando casos...</p>
+            </div>
+          ) : (
+            <CasesList
+              cases={cases}
+              onEdit={handleOpenEditModal}
+              onDelete={handleOpenDeleteConfirm}
+            />
+          )}
         </section>
       </div>
 
@@ -114,20 +115,22 @@ export default function DashboardPage() {
         onSubmit={handleCreateCase}
       />
 
-      <CaseModalForm
-        isOpen={isEditModalOpen}
-        caseData={editingCase}
-        onClose={() => {
-          setIsEditModalOpen(false);
-          setEditingCase(undefined);
-        }}
-        onSubmit={handleEditCase}
-      />
+      {isEditModalOpen && editingCase && (
+        <CaseModalForm
+          isOpen={isEditModalOpen}
+          caseData={editingCase}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setEditingCase(undefined);
+          }}
+          onSubmit={handleEditCase}
+        />
+      )}
 
       <ConfirmDialog
         isOpen={isConfirmOpen}
         title="Eliminar Caso"
-        message={`¿Estás seguro de que deseas eliminar el caso "${caseToDelete?.title}"? Esta acción no se puede deshacer.`}
+        message={`¿Estás seguro de que deseas eliminar el caso "${caseToDelete?.name}"? Esta acción no se puede deshacer.`}
         onConfirm={handleDeleteCase}
         onCancel={() => {
           setIsConfirmOpen(false);
