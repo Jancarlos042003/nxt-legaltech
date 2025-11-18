@@ -1,32 +1,30 @@
 import { z } from "zod";
 
-export type CaseStatus = "nuevo" | "en_proceso" | "finalizado";
+export type CaseStatus = "nuevo" | "en progreso" | "finalizado";
 
 export interface Case {
   id: string;
-  title: string;
-  status: CaseStatus;
+  name: string;
   description: string;
-  createdAt: string;
+  status: CaseStatus;
+  created_at: string;
 }
 
-export interface CaseFormData {
-  title: string;
-  status: CaseStatus;
+export interface CreateCaseRequest {
+  name: string;
   description: string;
+  status?: CaseStatus;
 }
 
-export const caseSchema = z.object({
-  title: z.string().min(5, "El título debe tener al menos 5 caracteres"),
-  status: z.enum(["nuevo", "en_proceso", "finalizado"]),
-  description: z
-    .string()
-    .min(10, "La descripción debe tener al menos 10 caracteres"),
-});
+export interface UpdateCaseRequest {
+  name?: string;
+  description?: string;
+  status?: CaseStatus;
+}
 
 export const statusLabels: Record<CaseStatus, string> = {
   nuevo: "Nuevo",
-  en_proceso: "En Proceso",
+  "en progreso": "En Progreso",
   finalizado: "Finalizado",
 };
 
@@ -39,7 +37,7 @@ export const statusColors: Record<
     text: "text-blue-700",
     border: "border-blue-200",
   },
-  en_proceso: {
+  "en progreso": {
     bg: "bg-yellow-50",
     text: "text-yellow-700",
     border: "border-yellow-200",
@@ -50,3 +48,31 @@ export const statusColors: Record<
     border: "border-green-200",
   },
 };
+
+export const caseSchema = z.object({
+  name: z.string().min(5, "El título debe tener al menos 5 caracteres"),
+  status: z.enum(["nuevo", "en progreso", "finalizado"]),
+  description: z
+    .string()
+    .min(10, "La descripción debe tener al menos 10 caracteres"),
+});
+
+export const createCaseSchema = z.object({
+  name: z.string().min(5, "El título debe tener al menos 5 caracteres"),
+  status: z.enum(["nuevo", "en progreso", "finalizado"]).default("nuevo"),
+  description: z
+    .string()
+    .min(10, "La descripción debe tener al menos 10 caracteres"),
+});
+
+export const updateCaseSchema = z.object({
+  name: z
+    .string()
+    .min(5, "El título debe tener al menos 5 caracteres")
+    .optional(),
+  status: z.enum(["nuevo", "en progreso", "finalizado"]).optional(),
+  description: z
+    .string()
+    .min(10, "La descripción debe tener al menos 10 caracteres")
+    .optional(),
+});

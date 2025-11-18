@@ -11,7 +11,7 @@ interface CaseCardProps {
 }
 
 export function CaseCard({ caseItem, onEdit, onDelete }: CaseCardProps) {
-  const formattedDate = formatDistanceToNow(new Date(caseItem.createdAt), {
+  const formattedDate = formatDistanceToNow(new Date(caseItem.created_at), {
     addSuffix: true,
     locale: es,
   });
@@ -20,7 +20,7 @@ export function CaseCard({ caseItem, onEdit, onDelete }: CaseCardProps) {
     <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-lg font-bold text-[#3a1259] flex-1">
-          {caseItem.title}
+          {caseItem.name}
         </h3>
         <CaseStatusBadge status={caseItem.status} />
       </div>

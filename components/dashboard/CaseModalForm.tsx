@@ -2,13 +2,20 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Case, CaseFormData, caseSchema, statusLabels } from "@/lib/case";
+import {
+  Case,
+  CreateCaseRequest,
+  UpdateCaseRequest,
+  createCaseSchema,
+  updateCaseSchema,
+  statusLabels,
+} from "@/lib/case";
 
 interface CaseModalFormProps {
   isOpen: boolean;
   caseData?: Case;
   onClose: () => void;
-  onSubmit: (data: CaseFormData) => void;
+  onSubmit: (data: CreateCaseRequest | UpdateCaseRequest) => void;
   isLoading?: boolean;
 }
 
@@ -24,11 +31,11 @@ export function CaseModalForm({
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<CaseFormData>({
-    resolver: zodResolver(caseSchema),
+  } = useForm<CreateCaseRequest | UpdateCaseRequest>({
+    resolver: zodResolver(caseData ? updateCaseSchema : createCaseSchema),
     defaultValues: caseData
       ? {
-          title: caseData.title,
+          name: caseData.name,
           status: caseData.status,
           description: caseData.description,
         }
@@ -40,7 +47,7 @@ export function CaseModalForm({
     onClose();
   };
 
-  const handleFormSubmit = (data: CaseFormData) => {
+  const handleFormSubmit = (data: CreateCaseRequest | UpdateCaseRequest) => {
     onSubmit(data);
     reset();
   };
@@ -71,15 +78,13 @@ export function CaseModalForm({
               Título del Caso
             </label>
             <input
-              {...register("title")}
+              {...register("name")}
               type="text"
               placeholder="Ej: Caso de Divorcio"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7c96de]"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7c96de] placeholder-gray-500 text-black"
             />
-            {errors.title && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.title.message}
-              </p>
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
             )}
           </div>
 
@@ -89,7 +94,7 @@ export function CaseModalForm({
             </label>
             <select
               {...register("status")}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7c96de]"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7c96de] placeholder-gray-500 text-black"
             >
               {Object.entries(statusLabels).map(([key, label]) => (
                 <option key={key} value={key}>
@@ -112,7 +117,7 @@ export function CaseModalForm({
               {...register("description")}
               rows={4}
               placeholder="Describe los detalles del caso..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7c96de] resize-none"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7c96de] resize-none placeholder-gray-500 text-black"
             />
             {errors.description && (
               <p className="text-red-500 text-sm mt-1">
