@@ -11,6 +11,7 @@ function getSecretKey() {
 }
 
 export async function middleware(request: NextRequest) {
+  // Ahora esto funcionará porque la cookie está en el dominio correcto
   const token = request.cookies.get("token")?.value;
 
   if (!token) {
