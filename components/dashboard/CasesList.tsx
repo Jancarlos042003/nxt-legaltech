@@ -1,4 +1,4 @@
-import { Case } from "@/lib/case";
+import { Case } from "@/types/case";
 import { CaseCard } from "./CaseCard";
 
 interface CasesListProps {
