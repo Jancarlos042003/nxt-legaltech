@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { Case, CreateCaseRequest, UpdateCaseRequest } from "@/types/case";
 import { CasesList } from "@/components/dashboard/CasesList";
-import { CaseModalForm } from "@/components/dashboard/CaseModalForm";
+import { CreateCaseModal } from "@/components/dashboard/CreateCaseModal";
+import { EditCaseModal } from "@/components/dashboard/EditCaseModal";
 import { ConfirmDialog } from "@/components/dashboard/ConfirmDialog";
 import { caseService } from "@/services/caseService";
 
@@ -109,14 +110,14 @@ export default function DashboardPage() {
       </div>
 
       {/* Modals */}
-      <CaseModalForm
+      <CreateCaseModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSubmit={handleCreateCase}
       />
 
       {isEditModalOpen && editingCase && (
-        <CaseModalForm
+        <EditCaseModal
           isOpen={isEditModalOpen}
           caseData={editingCase}
           onClose={() => {
