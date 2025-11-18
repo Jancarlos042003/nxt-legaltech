@@ -1,4 +1,4 @@
-import { CaseStatus, statusLabels, statusColors } from "@/lib/case";
+import { CaseStatus, statusLabels, statusColors } from "@/types/case";
 
 interface CaseStatusBadgeProps {
   status: CaseStatus;
