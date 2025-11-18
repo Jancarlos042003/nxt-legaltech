@@ -35,4 +35,18 @@ export const authService = {
       throw new Error("Error al obtener usuario");
     }
   },
+
+  async logout(): Promise<void> {
+    try {
+      await axios.post(
+        `${API_URL}/auth/logout`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+    } catch (error) {
+      throw new Error("Error en logout");
+    }
+  },
 };

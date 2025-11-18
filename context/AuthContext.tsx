@@ -2,7 +2,6 @@
 
 import { createContext, useState, useEffect, ReactNode } from "react";
 import { authService } from "@/services/authService";
-import { tokenService } from "@/services/tokenService";
 import { User } from "@/types/user";
 import { LoginRequest } from "@/types/auth";
 
@@ -10,34 +9,28 @@ interface AuthContextProps {
   user: User | null;
   loading: boolean;
   login: (data: LoginRequest) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextProps>({
   user: null,
   loading: true,
   login: async () => {},
-  logout: () => {},
+  logout: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Cargar usuario automáticamente si la cookie HttpOnly existe
   useEffect(() => {
     const initAuth = async () => {
-      const token = tokenService.getToken();
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
       try {
-        const userData = await authService.me();
+        const userData = await authService.me(); // El backend lee la cookie
         setUser(userData);
-      } catch (error) {
-        console.error("Error al cargar usuario:", error);
-        tokenService.clearToken();
+      } catch {
+        setUser(null); // No hay cookie o está inválida
       } finally {
         setLoading(false);
       }
@@ -46,14 +39,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     initAuth();
   }, []);
 
+  // Login sin manipular tokens (cookie se setea en el backend)
   const login = async (credentials: LoginRequest) => {
     const response = await authService.login(credentials);
-    tokenService.setToken(response.token);
-    setUser(response.user);
+    setUser(response.user); // El backend ya envió la cookie
   };
 
-  const logout = () => {
-    tokenService.clearToken();
+  // ✅ Logout: backend borra la cookie con Set-Cookie
+  const logout = async () => {
+    await authService.logout();
     setUser(null);
   };
 
